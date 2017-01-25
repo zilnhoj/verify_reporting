@@ -98,12 +98,15 @@ def master_rp(date,rp):
 	worksheet = spreadsheet.worksheet(sheets_tabs_names[rp]['tabs'][0])
 	pwkdf = pd.DataFrame(worksheet.get_all_values())
 	start_cell = len(pwkdf)+1
-	# length_new_data = len(piwikdf)
+	
+	if len(pwkdf.where(pwkdf[0]==date).groupby(0).count())>0:
 
-	if len(pwkdf) < 1:
-		updatesheet(sheets_tabs_names[rp]['Spreadsheet_name'], sheets_tabs_names[rp]['tabs'][0],df,2,len(df))
+		if len(pwkdf) < 1:
+			updatesheet(sheets_tabs_names[rp]['Spreadsheet_name'], sheets_tabs_names[rp]['tabs'][0],df,2,len(df))
+		else:
+			updatesheet(sheets_tabs_names[rp]['Spreadsheet_name'], sheets_tabs_names[rp]['tabs'][0],df,start_cell,len(df))
 	else:
-		updatesheet(sheets_tabs_names[rp]['Spreadsheet_name'], sheets_tabs_names[rp]['tabs'][0],df,start_cell,len(df))
+		print('You have already run this report for the reporting period {}'.format(date))
 
 
 

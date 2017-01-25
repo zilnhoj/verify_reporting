@@ -34,7 +34,7 @@ def get_rp_pages(date,pageTitle,rp):
 
     return raw_result['nb_uniq_pageviews']
 
-piwik_data = get_rp_pages('2017-01-01,2017-01-01','Success - REGISTER_WITH_IDP','DWP UCDS')
+# piwik_data = get_rp_pages('2017-01-01,2017-01-01','Success - REGISTER_WITH_IDP','DWP UCDS')
 # piwik_data = get_piwik_data()
 
 def get_goal_results(date,goalid,rp):
@@ -66,6 +66,6 @@ def get_goal_results(date,goalid,rp):
     raw_goal = response.json()
 
     return raw_goal['nb_conversions']
-piwik_goal = get_goal_results('2017-01-01,2017-01-01','DWP UCDS',16)
+# piwik_goal = get_goal_results('2017-01-01,2017-01-01','DWP UCDS',16)
 
 
