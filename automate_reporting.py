@@ -48,7 +48,8 @@ def verification_data():
             
     return weekly_resultdf
 
-def format_vf_df(df,type): #type is either NEW or RETURNING
+def format_vf_df(df,type):
+    services_list = list(services.keys())
     services_list.insert(0,'Timestamp')
 
     if type == 'new':
@@ -84,14 +85,15 @@ def set_cols(df):
 def get_final_df():
     
     weekly_resultdf = verification_data()
-    weekly_resultdf = weekly_resultdf.groupby(['RP name','Response type']).resample('W')['Response type'].count()
+    weekly_resultdf = weekly_resultdf.groupby(['RP name','Response type']).resample('W-MON')['Response type'].count()
     weekly_resultdf = weekly_resultdf.unstack(level=0)
+    print(weekly_resultdf.head())
     weekly_resultdf.reset_index(inplace=True)
     weekly_new_pivot = format_vf_df(weekly_resultdf,'new')
-    weekly_new_pivot = set_cols(weekly_new_pivot)
+    # weekly_new_pivot = set_cols(weekly_new_pivot)
     weekly_new_pivot.reset_index(inplace=True)
     weekly_returning_pivot = format_vf_df(weekly_resultdf,'returning')
-    weekly_returning_pivot = set_cols(weekly_returning_pivot)
+    # weekly_returning_pivot = set_cols(weekly_returning_pivot)
     weekly_returning_pivot.reset_index(inplace=True)
 
 
