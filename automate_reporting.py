@@ -22,9 +22,12 @@ def get_date(date):
     return full_timestamp
 
 def get_verification_csvs(csvs,frequency):
-    print('data_csvs/verification/'+frequency+'/'+csvs)
+    print('../not_to_github/verification/'+frequency+'/'+csvs)
     df = pd.read_csv('../not_to_github/verification/'+frequency+'/'+csvs)
+    # print(df.columns)
     df['RP name'] = df.apply(lambda row: aggregate_automate(row['RP Entity Id']),axis=1)
+    df = df[['Timestamp','Response type','RP name']]
+    # print(df.columns)
     
     df.index = pd.to_datetime(df['Timestamp'])
     
@@ -45,6 +48,7 @@ def verification_data():
         weekly_resultdf = weekly_resultdf.append(get_verification_csvs(csv,'weekly'))
 
     weekly_resultdf.index = pd.to_datetime(weekly_resultdf['Timestamp'])
+    # weekly_resultdf = weekly_resultdf[['RP Entity Id','Response type']]
             
     return weekly_resultdf
 
@@ -67,27 +71,14 @@ def format_vf_df(df,type):
         
     return df
 
-def totals(df):
-    dfcolumns = list(df.columns)
-    dfcolumns.remove('Timestamp')
-    df['total'] = df[dfcolumns].sum(axis=1)
-    return df['total']
 
-def set_cols(df):
-    df['total'] = totals(df)
-
-    df = df[services_list]
-
-    # df = df[['Timestamp','total','DEFRA RP','DVLA VDL','DWP UCDS','HMRC CC','HMRC FANDF','HMRC PTA','HMRC SA','HMRC TE','HMRC YSP','DVLA F2D RENEW','DVLA F2D REPORT','BIS RP']]
-
-    return df
 
 def get_final_df():
     
     weekly_resultdf = verification_data()
     weekly_resultdf = weekly_resultdf.groupby(['RP name','Response type']).resample('W-MON')['Response type'].count()
     weekly_resultdf = weekly_resultdf.unstack(level=0)
-    print(weekly_resultdf.head())
+    # print(weekly_resultdf.head())
     weekly_resultdf.reset_index(inplace=True)
     weekly_new_pivot = format_vf_df(weekly_resultdf,'new')
     # weekly_new_pivot = set_cols(weekly_new_pivot)
@@ -98,3 +89,27 @@ def get_final_df():
 
 
     return weekly_new_pivot, weekly_returning_pivot
+
+def all_csv_data():
+    weekly_resultdf = verification_data()
+    return weekly_resultdf
+
+
+    
+# def totals(df):
+#     dfcolumns = list(df.columns)
+#     dfcolumns.remove('Timestamp')
+#     df['total'] = df[dfcolumns].sum(axis=1)
+#     return df['total']
+
+# def set_cols(df):
+#     df['total'] = totals(df)
+
+#     df = df[services_list]
+
+#     # df = df[['Timestamp','total','DEFRA RP','DVLA VDL','DWP UCDS','HMRC CC','HMRC FANDF','HMRC PTA','HMRC SA','HMRC TE','HMRC YSP','DVLA F2D RENEW','DVLA F2D REPORT','BIS RP']]
+
+#     return df
+# def sum_from_dates(start_date,end_date,df,rp):
+#     df = df[(df['strp_timestamp']>=start_date) & (df['strp_timestamp']<=end_date)]
+#     return df[rp].sum()

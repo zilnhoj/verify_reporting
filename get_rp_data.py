@@ -10,11 +10,43 @@ import pandas as pd
 import to_sheets
 from to_sheets import updatesheet
 from to_sheets import spreadsheet_setup
+# from automate_reporting import all_csv_data
+from automate_piwik import get_rp_pages_pvs
+
+
+start_date = input('Enter week start date in the format yyyy-mm-dd: ')
+end_date = input('Enter the week end date in the format yyyy-mm-dd: ')
+
+date = '{},{}'.format(start_date,end_date)
+print(date)
 
 weekly_new, weekly_returning = get_final_df()
 
+def get_date(date):
+    full_timestamp = date[:date.find('T')]
+    return full_timestamp
+
+# all_csv_data = all_csv_data()
+# all_csv_data['strp_timestamp'] = all_csv_data.apply(lambda row: get_date(row['Timestamp']),axis=1)
+# weekly_new = all_csv_data[all_csv_data['Response type']=='NEW']
+# weekly_returning = all_csv_data[all_csv_data['Response type']=='RETURNING']
+
 raw_result = get_goals_ids()
-date = '2017-01-23,2017-01-29'
+# date = '2017-01-23,2017-01-29'
+# date = '2017-01-16,2017-01-22'
+
+
+
+# if len(dateRange)<1 : dateRange=date_list[-1:]
+# period = raw_input('Enter period: ')
+# if len(period)<1 : period ='week'
+# print str(dateRange) + " " + str(period)
+
+def sum_from_dates(start_date,end_date,df,rp):
+    df = df[df['RP name']==rp]
+    df = df[(df['strp_timestamp']>=start_date) & (df['strp_timestamp']<=end_date)]
+
+    return df['RP name'].count()
 
 def get_week(date):
 	return date[:date.find(',')] + ' to ' + date[date.find(',')+1:]
@@ -56,52 +88,59 @@ with open('../config_files/sheet_tab_names.json') as sts:
 	
 # 	pgeindx = [i for i,x in enumerate(results) if page in x.get('label')]
 # 	return results[pgeindx].get('')
-def row_by_date(df):
-	return df[df['Timestamp']==date[:date.find(',')]]
-
-
-def master_rp(date,rp): 
+def row_by_date(df,rp):
 	print(rp)
+	return df[rp][df['Timestamp']==date[:date.find(',')]]
 
-	df = pd.DataFrame({'Week': week,
-						'[F] Total_number_of_successful_matches':get_rp_pages(date,pages['matching'],services[rp]),
-					 	'[I] verifications verifications csv [Weekly - verifications]':row_by_date(weekly_returning)[rp],
-						'[P] Success - REGISTER_WITH_IDP':get_rp_pages(date,pages['success_register'],services[rp]),
-						'[Q] Failure - REGISTER_WITH_IDP':get_rp_pages(date,pages['register_failure'],services[rp]),
-						'[R] Cancel - REGISTER_WITH_IDP':get_rp_pages(date,pages['cancel_register'],services[rp]),
-						'[S] Success - SIGN_IN_WITH_IDP':get_rp_pages(date,pages['success_register'],services[rp]),
-						'[T] signin journeys started (goal s2)':get_goal_results(date,map_goals['S2 IDP Was Chosen for Sign In'],services[rp]),
-						'[U] sign-ins hub data verifications csv - service':row_by_date(weekly_new)[rp],
-						'[H] visits where a verification journey startedPiwik - UPV':get_rp_pages(date,pages['choosing'],services[rp]),
-						'[V] IDP visits with a reg requestV4':get_goal_results(date,map_goals['V4 IDP Was Chosen for Verification'],services[rp])})
+# def sum_from_dates(start_date,end_date,df,rp):
+#     df = df[(df['strp_timestamp']>=start_date) & (df['strp_timestamp']<=end_date)]
+#     return df.sum()
 
-	df['[k] visits where a signin journey started'] = df['[T] signin journeys started (goal s2)']-(df['[I] verifications verifications csv [Weekly - verifications]']-df['[P] Success - REGISTER_WITH_IDP'])
-	df['[L] visits where a user signed in'] = df['[S] Success - SIGN_IN_WITH_IDP']- (df['[I] verifications verifications csv [Weekly - verifications]']-df['[P] Success - REGISTER_WITH_IDP'])
-	df['[B] Visits started on GOV.UK Verify hub'] = df['[H] visits where a verification journey startedPiwik - UPV'] + df['[k] visits where a signin journey started']
-	df['[C] Visits with a successful verification or signin'] = df['[I] verifications verifications csv [Weekly - verifications]'] + df['[L] visits where a user signed in']
-	df['[D] (B/A) Overall completion rate'] = df['[C] Visits with a successful verification or signin']/df['[B] Visits started on GOV.UK Verify hub']
-	df['[E] Total verifications and signins'] = df['[I] verifications verifications csv [Weekly - verifications]'] + df['[U] sign-ins hub data verifications csv - service']
-	df['[G] (D/C) Match rate'] = df['[F] Total_number_of_successful_matches']/df['[E] Total verifications and signins']
-	df['[J] verification completion rate'] = df['[I] verifications verifications csv [Weekly - verifications]']/df['[H] visits where a verification journey startedPiwik - UPV']
-	df['[M] Signin completion rate'] = df['[L] visits where a user signed in']/df['[k] visits where a signin journey started']
-	df['[W] percentage of verifications from 1st time users'] = (df['[H] visits where a verification journey startedPiwik - UPV']+df['[S] Success - SIGN_IN_WITH_IDP'])/((df['[H] visits where a verification journey startedPiwik - UPV']+0.12)+df['[H] visits where a verification journey startedPiwik - UPV']) #really need to check this data point 
-	df['[N] success rate'] = df['[I] verifications verifications csv [Weekly - verifications]']/(df['[I] verifications verifications csv [Weekly - verifications]']+df['[Q] Failure - REGISTER_WITH_IDP']+(df['[R] Cancel - REGISTER_WITH_IDP']/2))
-	df['[X] People visiting an IDP to register'] = df['[V] IDP visits with a reg requestV4']+df['[W] percentage of verifications from 1st time users']
-	df['[O] IPD Conversion rate'] = (df['[I] verifications verifications csv [Weekly - verifications]']+df['[L] visits where a user signed in'])/(df['[k] visits where a signin journey started']+df['[X] People visiting an IDP to register'])
+totaldf = pd.DataFrame()
+def master_rp(date,rp): 
+	# print('{} verifications returning - {} verifications new {}'.format(rp,row_by_date(weekly_returning,rp),row_by_date(weekly_new,rp)))
+
+	df = pd.DataFrame({"rp":rp,
+						'Week': week,
+						'(D) Total number of successful matches':get_rp_pages_pvs(date,pages['matching'],services[rp]),
+					 	'verifications':row_by_date(weekly_new,rp),
+					 	# 'verifications':sum_from_dates(start_date,end_date,weekly_new,rp),
+						'Success - REGISTER_WITH_IDP':get_rp_pages(date,pages['success_register'],services[rp]),
+						'Failure - REGISTER_WITH_IDP':get_rp_pages(date,pages['register_failure'],services[rp]),
+						'Cancel - REGISTER_WITH_IDP':get_rp_pages(date,pages['cancel_register'],services[rp]),
+						'Success - SIGN_IN_WITH_IDP':get_rp_pages(date,pages['success_sign'],services[rp]),
+						'signin journeys started (goal s2)':get_goal_results(date,map_goals['S2 IDP Was Chosen for Sign In'],services[rp]),
+						'sign-ins hub data':row_by_date(weekly_returning,rp),
+						# 'sign-ins hub data':sum_from_dates(start_date,end_date,weekly_returning,rp),
+						'visits where a verification journey started':get_rp_pages(date,pages['choosing'],services[rp]),
+						'IDP visits with a reg request V4':get_goal_results(date,map_goals['V4 IDP Was Chosen for Verification'],services[rp])})
+
+	df['visits where a signin journey started'] = df['signin journeys started (goal s2)']-(df['verifications']-df['Success - REGISTER_WITH_IDP'])
+	df['visits where a user signed in'] = df['Success - SIGN_IN_WITH_IDP'] - (df['verifications']-df['Success - REGISTER_WITH_IDP'])
+	df['(A) Visits started on the GOV.UK Verify hub'] = df['visits where a verification journey started'] + df['visits where a signin journey started']
+	df['(B) Visits with a successful verification or sign-in'] = df['verifications'] + df['visits where a user signed in']
+	df['(B/A) Overall completion rate'] = df['(B) Visits with a successful verification or sign-in']/df['(A) Visits started on the GOV.UK Verify hub']
+	df['(C) Total verifications and signins'] = df['verifications'] + df['sign-ins hub data']
+	df['(D/C) Match rate'] = df['(D) Total number of successful matches']/df['(C) Total verifications and signins']
+	df['verification completion rate'] = df['verifications']/df['visits where a verification journey started']
+	df['Signin completion rate'] = df['visits where a user signed in']/df['visits where a signin journey started']
+	
+
+	# print('all dataframe {}'.format(df.tail()))
 
 	df = df[['Week',
-	'[B] Visits started on GOV.UK Verify hub',
-	'[C] Visits with a successful verification or signin',
-	'[D] (B/A) Overall completion rate',
-	'[E] Total verifications and signins',
-	'[F] Total_number_of_successful_matches',
-	'[G] (D/C) Match rate',
-	'[H] visits where a verification journey startedPiwik - UPV',
-	'[I] verifications verifications csv [Weekly - verifications]',
-	'[J] verification completion rate',
-	'[k] visits where a signin journey started',
-	'[L] visits where a user signed in',
-	'[M] Signin completion rate']]
+	'(A) Visits started on the GOV.UK Verify hub',
+	'(B) Visits with a successful verification or sign-in',
+	'(B/A) Overall completion rate',
+	'(C) Total verifications and signins',
+	'(D) Total number of successful matches',
+	'(D/C) Match rate',
+	'visits where a verification journey started',
+	'verifications',
+	'verification completion rate',
+	'visits where a signin journey started',
+	'visits where a user signed in',
+	'Signin completion rate']]
 
 	gc = spreadsheet_setup()
 	spreadsheet = gc.open(sheets_tabs_names[rp]['Spreadsheet_name'])
@@ -109,18 +148,28 @@ def master_rp(date,rp):
 	pwkdf = pd.DataFrame(worksheet.get_all_values())
 	start_cell = len(pwkdf)+1
 	
-	if len(pwkdf[pwkdf[0]==date])>0:
 
-		if len(pwkdf) < 1:
-			updatesheet(sheets_tabs_names[rp]['Spreadsheet_name'], sheets_tabs_names[rp]['tabs'][0],df,2,len(df))
-		else:
-			updatesheet(sheets_tabs_names[rp]['Spreadsheet_name'], sheets_tabs_names[rp]['tabs'][0],df,start_cell,len(df))
+	check_date = pwkdf[pwkdf[0]==week]
+
+	print('Length of check date {}'.format(len(check_date)))
+	# # if len(check_date) == 0:
+
+	
+	# # print('Length of check date {} and head {} and week {}'.format(len(check_date),check_date.head(1),week))
+
+	if len(pwkdf) < 1:
+		updatesheet(sheets_tabs_names[rp]['Spreadsheet_name'], sheets_tabs_names[rp]['tabs'][0],df,2,len(df))
 	else:
-		print('You have already run this report for the reporting period {}'.format(date))
+		updatesheet(sheets_tabs_names[rp]['Spreadsheet_name'], sheets_tabs_names[rp]['tabs'][0],df,start_cell,len(df))
+	# else:
+	# 	print('You have already run this report for the reporting period {}'.format(week))
+
+	# return df
 
 
 
 for k,v in sheets_tabs_names.items():
-	print(k)
+	# print(k)
 	master_rp(date,k)
-	
+	# df = master_rp(date,k)
+	# totaldf = totaldf.append(df)
