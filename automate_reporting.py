@@ -22,8 +22,8 @@ def get_date(date):
     return full_timestamp
 
 def get_verification_csvs(csvs,frequency):
-    print('../not_to_github/verification/'+frequency+'/'+csvs)
-    df = pd.read_csv('../not_to_github/verification/'+frequency+'/'+csvs)
+    print('../raw_files/verification/'+frequency+'/'+csvs)
+    df = pd.read_csv('../raw_files/verification/'+frequency+'/'+csvs)
     # print(df.columns)
     df['RP name'] = df.apply(lambda row: aggregate_automate(row['RP Entity Id']),axis=1)
     df = df[['Timestamp','Response type','RP name']]
@@ -34,7 +34,7 @@ def get_verification_csvs(csvs,frequency):
     return df
     
 def verification_data():
-    verification_weekly_csvs = os.listdir('../not_to_github/verification/weekly')
+    verification_weekly_csvs = os.listdir('../raw_files/verification/weekly')
 
     if '.DS_Store' in verification_weekly_csvs:
         verification_weekly_csvs.remove('.DS_Store')
@@ -71,31 +71,27 @@ def format_vf_df(df,type):
         
     return df
 
-
-
-def get_final_df():
-    
-    weekly_resultdf = verification_data()
-    weekly_resultdf = weekly_resultdf.groupby(['RP name','Response type']).resample('W-MON')['Response type'].count()
-    weekly_resultdf = weekly_resultdf.unstack(level=0)
-    # print(weekly_resultdf.head())
-    weekly_resultdf.reset_index(inplace=True)
-    weekly_new_pivot = format_vf_df(weekly_resultdf,'new')
-    # weekly_new_pivot = set_cols(weekly_new_pivot)
-    weekly_new_pivot.reset_index(inplace=True)
-    weekly_returning_pivot = format_vf_df(weekly_resultdf,'returning')
-    # weekly_returning_pivot = set_cols(weekly_returning_pivot)
-    weekly_returning_pivot.reset_index(inplace=True)
-
-
-    return weekly_new_pivot, weekly_returning_pivot
-
 def all_csv_data():
     weekly_resultdf = verification_data()
     return weekly_resultdf
 
-
+# def get_final_df():
     
+#     weekly_resultdf = verification_data()
+#     weekly_resultdf = weekly_resultdf.groupby(['RP name','Response type']).resample('W-MON')['Response type'].count()
+#     weekly_resultdf = weekly_resultdf.unstack(level=0)
+#     # print(weekly_resultdf.head())
+#     weekly_resultdf.reset_index(inplace=True)
+#     weekly_new_pivot = format_vf_df(weekly_resultdf,'new')
+#     # weekly_new_pivot = set_cols(weekly_new_pivot)
+#     weekly_new_pivot.reset_index(inplace=True)
+#     weekly_returning_pivot = format_vf_df(weekly_resultdf,'returning')
+#     # weekly_returning_pivot = set_cols(weekly_returning_pivot)
+#     weekly_returning_pivot.reset_index(inplace=True)
+
+
+#     return weekly_new_pivot, weekly_returning_pivot
+
 # def totals(df):
 #     dfcolumns = list(df.columns)
 #     dfcolumns.remove('Timestamp')
