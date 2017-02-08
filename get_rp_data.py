@@ -10,7 +10,7 @@ import pandas as pd
 import to_sheets
 from to_sheets import updatesheet
 from to_sheets import spreadsheet_setup
-# from automate_reporting import all_csv_data
+from automate_reporting import all_csv_data
 from automate_piwik import get_rp_pages_pvs
 
 
@@ -20,27 +20,18 @@ end_date = input('Enter the week end date in the format yyyy-mm-dd: ')
 date = '{},{}'.format(start_date,end_date)
 print(date)
 
-weekly_new, weekly_returning = get_final_df()
+# weekly_new, weekly_returning = get_final_df()
 
 def get_date(date):
     full_timestamp = date[:date.find('T')]
     return full_timestamp
 
-# all_csv_data = all_csv_data()
-# all_csv_data['strp_timestamp'] = all_csv_data.apply(lambda row: get_date(row['Timestamp']),axis=1)
-# weekly_new = all_csv_data[all_csv_data['Response type']=='NEW']
-# weekly_returning = all_csv_data[all_csv_data['Response type']=='RETURNING']
+all_csv_data = all_csv_data()
+all_csv_data['strp_timestamp'] = all_csv_data.apply(lambda row: get_date(row['Timestamp']),axis=1)
+weekly_new = all_csv_data[all_csv_data['Response type']=='NEW']
+weekly_returning = all_csv_data[all_csv_data['Response type']=='RETURNING']
 
 raw_result = get_goals_ids()
-# date = '2017-01-23,2017-01-29'
-# date = '2017-01-16,2017-01-22'
-
-
-
-# if len(dateRange)<1 : dateRange=date_list[-1:]
-# period = raw_input('Enter period: ')
-# if len(period)<1 : period ='week'
-# print str(dateRange) + " " + str(period)
 
 def sum_from_dates(start_date,end_date,df,rp):
     df = df[df['RP name']==rp]
@@ -92,28 +83,23 @@ def row_by_date(df,rp):
 	print(rp)
 	return df[rp][df['Timestamp']==date[:date.find(',')]]
 
-# def sum_from_dates(start_date,end_date,df,rp):
-#     df = df[(df['strp_timestamp']>=start_date) & (df['strp_timestamp']<=end_date)]
-#     return df.sum()
-
 totaldf = pd.DataFrame()
 def master_rp(date,rp): 
-	# print('{} verifications returning - {} verifications new {}'.format(rp,row_by_date(weekly_returning,rp),row_by_date(weekly_new,rp)))
+	print('RP {} '.format(rp))
 
-	df = pd.DataFrame({"rp":rp,
-						'Week': week,
+	df = pd.DataFrame({'Week': week,
 						'(D) Total number of successful matches':get_rp_pages_pvs(date,pages['matching'],services[rp]),
-					 	'verifications':row_by_date(weekly_new,rp),
-					 	# 'verifications':sum_from_dates(start_date,end_date,weekly_new,rp),
+					 	# 'verifications':row_by_date(weekly_new,rp),
+					 	'verifications':sum_from_dates(start_date,end_date,weekly_new,rp),
 						'Success - REGISTER_WITH_IDP':get_rp_pages(date,pages['success_register'],services[rp]),
 						'Failure - REGISTER_WITH_IDP':get_rp_pages(date,pages['register_failure'],services[rp]),
 						'Cancel - REGISTER_WITH_IDP':get_rp_pages(date,pages['cancel_register'],services[rp]),
 						'Success - SIGN_IN_WITH_IDP':get_rp_pages(date,pages['success_sign'],services[rp]),
 						'signin journeys started (goal s2)':get_goal_results(date,map_goals['S2 IDP Was Chosen for Sign In'],services[rp]),
-						'sign-ins hub data':row_by_date(weekly_returning,rp),
-						# 'sign-ins hub data':sum_from_dates(start_date,end_date,weekly_returning,rp),
+						# 'sign-ins hub data':row_by_date(weekly_returning,rp),
+						'sign-ins hub data':sum_from_dates(start_date,end_date,weekly_returning,rp),
 						'visits where a verification journey started':get_rp_pages(date,pages['choosing'],services[rp]),
-						'IDP visits with a reg request V4':get_goal_results(date,map_goals['V4 IDP Was Chosen for Verification'],services[rp])})
+						'IDP visits with a reg request V4':get_goal_results(date,map_goals['V4 IDP Was Chosen for Verification'],services[rp])},index=[0])
 
 	df['visits where a signin journey started'] = df['signin journeys started (goal s2)']-(df['verifications']-df['Success - REGISTER_WITH_IDP'])
 	df['visits where a user signed in'] = df['Success - SIGN_IN_WITH_IDP'] - (df['verifications']-df['Success - REGISTER_WITH_IDP'])
@@ -152,19 +138,15 @@ def master_rp(date,rp):
 	check_date = pwkdf[pwkdf[0]==week]
 
 	print('Length of check date {}'.format(len(check_date)))
-	# # if len(check_date) == 0:
-
-	
-	# # print('Length of check date {} and head {} and week {}'.format(len(check_date),check_date.head(1),week))
-
-	if len(pwkdf) < 1:
-		updatesheet(sheets_tabs_names[rp]['Spreadsheet_name'], sheets_tabs_names[rp]['tabs'][0],df,2,len(df))
+	if len(check_date) == 0:
+	# print('Length of check date {} and head {} and week {}'.format(len(check_date),check_date.head(1),week))
+		if len(pwkdf) < 1:
+			updatesheet(sheets_tabs_names[rp]['Spreadsheet_name'], sheets_tabs_names[rp]['tabs'][0],df,2,len(df))
+		else:
+			updatesheet(sheets_tabs_names[rp]['Spreadsheet_name'], sheets_tabs_names[rp]['tabs'][0],df,start_cell,len(df))
 	else:
-		updatesheet(sheets_tabs_names[rp]['Spreadsheet_name'], sheets_tabs_names[rp]['tabs'][0],df,start_cell,len(df))
-	# else:
-	# 	print('You have already run this report for the reporting period {}'.format(week))
+		print('You have already run this report for the reporting period {}'.format(week))
 
-	# return df
 
 
 
