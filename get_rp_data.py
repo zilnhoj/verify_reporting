@@ -1,6 +1,6 @@
 import json
 import automate_reporting
-from automate_reporting import get_final_df
+# from automate_reporting import get_final_df
 import id_goals
 from id_goals import get_goals_ids
 import automate_piwik
@@ -127,6 +127,10 @@ def master_rp(date,rp):
 	'visits where a signin journey started',
 	'visits where a user signed in',
 	'Signin completion rate']]
+
+	# print('{} count of verifications {}'.format(rp,df.head()))
+
+	# return df
 
 	gc = spreadsheet_setup()
 	spreadsheet = gc.open(sheets_tabs_names[rp]['Spreadsheet_name'])
