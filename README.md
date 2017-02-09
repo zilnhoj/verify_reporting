@@ -79,7 +79,9 @@ When you are running the script for the first time you need to
 
 # Running the script
 
-- in the terminal window make sure you are in the automate_performance_reporting folder
+Once you are set up you need to 
+
+- check in the terminal window and make sure you are in the automate_performance_reporting folder
 - if you are not in your virtual environment type source bin/activate. When you are in your virtual enfironment you will see (automate-reporting) preceeding your commant prompt
 - if you want to run the script in iPython type ipython
 - then type run get_rp_data.py
