@@ -51,22 +51,24 @@ You will need to:
 There is a few things you need to be aware of when running this script
 
 You will need to create a folder set up like 
+```
 |-- raw_files
 	|-- verification
 		|-- daily
 		|-- weekly
+```
 
 You need to copy all the csv files to the relavent folder i.e. all weekly verification data needs to go into the raw_files/verification/weekly folder
 Do not put dublicate files into the folder as all data in the folder will ba aggregated and you will introduce duplicated data into your reporting
 
 There are 4 seperate scripts used to automate the reporting process.
 
-automate_piwik.py - uses the PIWIK API to get data you need for each RP and puts the data into a Pandas dataframe
-automate_reporting.py - gathers all the data from the csv's in the weekly folder and aggregates the data into relevant Pandas dataframes
-to_sheets.py - passes the data from dataframes into your Google Sheets tabs
-get_rp_data.py uses the automate_reporting.py and the automate_piwik.py files to build a dataframe uing criteria supplied in the 'services.json' file.  It passes the data to_sheets.py script which inserts the datainto your Google Sheets tabs
+- automate_piwik.py - uses the PIWIK API to get data you need for each RP and puts the data into a Pandas dataframe
+- automate_reporting.py - gathers all the data from the csv's in the weekly folder and aggregates the data into relevant Pandas dataframes
+- to_sheets.py - passes the data from dataframes into your Google Sheets tabs
+- get_rp_data.py uses the automate_reporting.py and the automate_piwik.py files to build a dataframe uing criteria supplied in the 'services.json' file.  It passes the data to_sheets.py script which inserts the datainto your Google Sheets tabs
 
-# Running the script
+# Setting up to run the script for the first time
 
 When you are running the script for the first time you need to
 
@@ -75,7 +77,7 @@ When you are running the script for the first time you need to
 - this installs all the python libraries you need to run the scripts
 - follow the instructions below
 
-Every subsequent times you run the script you need to follow these instructions
+# Running the script
 
 - in the terminal window make sure you are in the automate_performance_reporting folder
 - if you are not in your virtual environment type source bin/activate. When you are in your virtual enfironment you will see (automate-reporting) preceeding your commant prompt
