@@ -58,7 +58,7 @@ def get_rp_pages(date,pageTitle,rp):
         'token_auth': token,
     }
     response = requests.get(url,qs)
-    # print('the pages report rp {} and URL {}'.format(rp,response.url))
+    print('the pages report rp {} and URL {}'.format(rp,response.url))
     raw_result = response.json()
 
     return raw_result['nb_uniq_pageviews']
