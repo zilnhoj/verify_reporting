@@ -39,7 +39,8 @@ The JSON file should be in the format
 ```
 Replace the 'foo" with your PIWIK token
 
-This script uses a canonical creds folder which you will need to clone one level up from this folder
+This script uses a canonical creds folder which you will need to clone one level up from this folder.
+
 Follow the instructions at the [verify_config repository](https://github.com/zilnhoj/verify_config_files) 
 
 You will need to set up access to the Google Drive api in order to push the data in the script to your spreadsheet
