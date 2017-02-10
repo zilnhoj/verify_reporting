@@ -23,7 +23,7 @@ You are now ready to clone the project
 
 Type git clone git@github.com:zilnhoj/verify_reporting.git
 
-When you have cloned it you need to set up a creds folder one level down from your automate-reporting folder
+When you have cloned it you need to set up a creds folder one level up from your automate-reporting folder
 
 In your creds folder create a JSON file which contains your PIWIK token.
 
@@ -35,7 +35,7 @@ The JSON file should be in the format
 ```
 Replace the 'foo" with your PIWIK token
 
-As well as using the creds folder you also need to clone the verify_config repository https://github.com/zilnhoj/verify_config_files one level up from this project 
+As well as using the creds folder you also need to clone the [verify_config repository](https://github.com/zilnhoj/verify_config_files) one level up from this project 
 
 You will need to set up access to the Google Drive api in order to push the data in the script to your spreadsheet
 
@@ -51,22 +51,24 @@ You will need to:
 There is a few things you need to be aware of when running this script
 
 You will need to create a folder set up like 
+```
 |-- raw_files
 	|-- verification
 		|-- daily
 		|-- weekly
+```
 
 You need to copy all the csv files to the relavent folder i.e. all weekly verification data needs to go into the raw_files/verification/weekly folder
 Do not put dublicate files into the folder as all data in the folder will ba aggregated and you will introduce duplicated data into your reporting
 
 There are 4 seperate scripts used to automate the reporting process.
 
-automate_piwik.py - uses the PIWIK API to get data you need for each RP and puts the data into a Pandas dataframe
-automate_reporting.py - gathers all the data from the csv's in the weekly folder and aggregates the data into relevant Pandas dataframes
-to_sheets.py - passes the data from dataframes into your Google Sheets tabs
-get_rp_data.py uses the automate_reporting.py and the automate_piwik.py files to build a dataframe uing criteria supplied in the 'services.json' file.  It passes the data to_sheets.py script which inserts the datainto your Google Sheets tabs
+- automate_piwik.py - uses the PIWIK API to get data you need for each RP and puts the data into a Pandas dataframe
+- automate_reporting.py - gathers all the data from the csv's in the weekly folder and aggregates the data into relevant Pandas dataframes
+- to_sheets.py - passes the data from dataframes into your Google Sheets tabs
+- get_rp_data.py uses the automate_reporting.py and the automate_piwik.py files to build a dataframe uing criteria supplied in the 'services.json' file.  It passes the data to_sheets.py script which inserts the datainto your Google Sheets tabs
 
-# Running the script
+# Setting up to run the script for the first time
 
 When you are running the script for the first time you need to
 
@@ -75,9 +77,11 @@ When you are running the script for the first time you need to
 - this installs all the python libraries you need to run the scripts
 - follow the instructions below
 
-Every subsequent times you run the script you need to follow these instructions
+# Running the script
 
-- in the terminal window make sure you are in the automate_performance_reporting folder
+Once you are set up you need to 
+
+- check in the terminal window and make sure you are in the automate_performance_reporting folder
 - if you are not in your virtual environment type source bin/activate. When you are in your virtual enfironment you will see (automate-reporting) preceeding your commant prompt
 - if you want to run the script in iPython type ipython
 - then type run get_rp_data.py
@@ -86,3 +90,10 @@ Every subsequent times you run the script you need to follow these instructions
 - if you don't want to use ipython type python data_to_scripts.py
 - enter the start date for the week you are running the report for in the format yyyy-mm-dd
 - enter the end date for the week you are running the report for in the format yyyy-mm-dd
+
+# Adding serivces 
+
+When new services are added to Verify you need to update some files in the [config folder](https://github.com/zilnhoj/verify_config_files) in order to include these new new servcies in your reporting.  
+
+Instructions on what you need to do is available at the repository 
+
