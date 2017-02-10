@@ -9,7 +9,7 @@ The purpose of this script is to
 
 # Instructions
 
-# Clone the project
+## Clone the project
 
 We are going to be working on the command line so open up a Terminal session 
 
@@ -21,7 +21,10 @@ Once you have github set up, using the Change Directory command, cd, to change t
 
 You are now ready to clone the project
 
-Type git clone git@github.com:zilnhoj/verify_reporting.git
+Type 
+```
+git clone git@github.com:zilnhoj/verify_reporting.git
+```
 
 When you have cloned it you need to set up a creds folder one level up from your automate-reporting folder
 
@@ -36,10 +39,10 @@ The JSON file should be in the format
 ```
 Replace the 'foo" with your PIWIK token
 
-As well as using the creds folder you also need to clone the [verify_config repository](https://github.com/zilnhoj/verify_config_files) one level up from this project 
+This script uses a canonical creds folder which you will need to clone one level up from this folder
+Follow the instructions at the [verify_config repository](https://github.com/zilnhoj/verify_config_files) 
 
 You will need to set up access to the Google Drive api in order to push the data in the script to your spreadsheet
-
 Follow the instructions on how to authenticate with the Google Sheets API shown in this [blog post](http://pbpython.com/pandas-google-forms-part1.html).
 
 You will need to:
@@ -49,7 +52,7 @@ You will need to:
 - share the email address given in your client_secrets.json file with your Google drive spreadsheet
 
 
-#Data location
+## Data location
 
 There is a few things you need to be aware of when running this script
 
@@ -71,7 +74,7 @@ There are 4 seperate scripts used to automate the reporting process.
 - to_sheets.py - passes the data from dataframes into your Google Sheets tabs
 - get_rp_data.py - uses the automate_reporting.py and the automate_piwik.py files to build a dataframe uing criteria supplied in the 'services.json' file.  It passes the data to_sheets.py script which inserts the data into your Google Sheets tabs
 
-# Setting up to run the script for the first time
+## Setting up to run the script for the first time
 
 When running the script for the first time use command prompt to 
 
@@ -79,7 +82,7 @@ When running the script for the first time use command prompt to
 - type pip install -r requirements.txt - this installs all the python libraries you need to run the scripts
 - follow the instructions below
 
-# Running the script
+## Running the script
 
 Once you are set up and ready to run the script
 
@@ -93,7 +96,7 @@ Once you are set up and ready to run the script
 - enter the start date for the week you are running the report for in the format yyyy-mm-dd
 - enter the end date for the week you are running the report for in the format yyyy-mm-dd
 
-# Adding services 
+## Adding services 
 
 When new services are added to Verify you need to update some files in the [config folder](https://github.com/zilnhoj/verify_config_files) repository.  Otherwise these new services will not be included in your reporting
 
