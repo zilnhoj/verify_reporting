@@ -77,17 +77,20 @@ There are 4 seperate scripts used to automate the reporting process.
 
 ## Setting up to run the script for the first time
 
+
 When running the script for the first time use command prompt to 
 
 - type source bin/activate
 - type pip install -r requirements.txt - this installs all the python libraries you need to run the scripts
 - follow the instructions below
 
-## Running the script
 
-Once you are set up and ready to run the script
+# Running the script
 
-- in the terminal window check and make sure you are in the automate_performance_reporting folder
+Once you are set up you need to 
+
+- check in the terminal window and make sure you are in the automate_performance_reporting folder
+
 - if you are not in your virtual environment type source bin/activate. When you are in your virtual enfironment you will see (automate-reporting) preceeding your commant prompt
 - to run the script in iPython type ipython
 - then type run get_rp_data.py
